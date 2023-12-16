@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id       Int     @id @default(autoincrement())
+  username String? @db.VarChar(50)
+  email    String? @unique @db.VarChar(50)
+  password String? @db.Text()
+
+  post    Posts[]
+  comment Comments[]
+  saved   Saved[]
+
+  timestamp DateTime? @db.Timestamp(0)
+}
+
+model Posts {
+  id    Int     @id @default(autoincrement())
+  title String? @db.VarChar(255)
+  image String? @db.VarChar(255)
+
+  user_id  Int
+  user     Users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  saved    Saved[]
+  Comments Comments[]
+
+  timestamp DateTime? @db.Timestamp(0)
+}
+
+model Comments {
+  id      Int     @id @default(autoincrement())
+  content String? @db.VarChar(255)
+
+  user_id Int
+  post_id Int
+  user    Users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  post    Posts @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  timestamp DateTime? @db.Timestamp(0)
+}
+
+model Saved {
+  id Int @id @default(autoincrement())
+
+  user_id Int
+  post_id Int
+  user    Users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  post    Posts @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  timestamp DateTime? @db.Timestamp(0)
+}
